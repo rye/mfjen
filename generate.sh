@@ -219,26 +219,13 @@ PROGRAMOBJECTS=$OBJECTS
 PROGRAM=$PROJECT_NAME.\$(shell arch)
 
 all: \$(PROGRAM)
-" > Makefile
 
-for i in $OBJECTS;
-do
-	echo "Generating rule for $i"
+obj/%.o: src/%.c \$(HEADERS)
+	\$(COMPILER) -c -o \$@ \$< \$(COMPILEFLAGS) -fPIC
 
-	bn=$(basename $i)
-	
-	echo \
-"$i: \$(HEADERS) src/${bn%.*}.c
-	\$(COMPILER) -c -o $i src/${bn%.*}.c \$(COMPILEFLAGS) -fPIC
-" >> Makefile
-	
-done
-
-echo \
-"
 \$(PROGRAM): \$(PROGRAMOBJECTS)
 	\$(COMPILER) -o \$(PROGRAM) \$(PROGRAMOBJECTS) \$(LINKFLAGS)
-" >> Makefile
+" > Makefile
 }
 
 src_test
