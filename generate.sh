@@ -111,6 +111,7 @@ detect_language ()
 				LANGUAGE="C++"
 				;;
 		esac
+		FILE_EXTENSION="${filename##*.}"
 	done
 }
 
@@ -192,7 +193,7 @@ PROGRAM=$PROJECT_NAME.\$(shell arch)
 
 all: \$(PROGRAM)
 
-obj/%.o: src/%.c \$(HEADERS)
+obj/%.o: src/%.$FILE_EXTENSION \$(HEADERS)
 	\$(COMPILER) -c -o \$@ \$< \$(COMPILEFLAGS) -fPIC
 
 \$(PROGRAM): \$(PROGRAMOBJECTS)
