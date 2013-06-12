@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Detects if src/*/*.{h,c} is a thing
+# (only detects first-level subdirectories, symlink if necessarily)
+detect_multi_src_folders ()
+{
+	SUBDIRECTORY_NAME_ARRAY=(src/*/)
+	for ((i=0;i<${#SUBDIRECTORY_NAME_ARRAY[@]};i+=1));
+	do
+		if [ "$(basename ${SUBDIRECTORY_NAME_ARRAY[$i]})" = "*" ];
+		then
+			return
+		fi
+	done
+}
+
+# Prints, with given color (Argument #1), the given string (Argument #2)
+# Uses ANSI escape sequences, tested on XTerm and Terminator
 print_with_color ()
 {
 	case $1 in
@@ -36,6 +52,7 @@ print_with_color ()
 	echo -e "\033[39m"
 }
 
+# Tests to make sure that src exists
 src_test ()
 {
 	if [ "$SRC_MUST_EXIST" != "1" ];
@@ -59,6 +76,7 @@ src_test ()
 	fi
 }
 
+# Tests to make sure that obj exists
 obj_test ()
 {
 	if [ "$OBJ_MUST_EXIST" != "1" ];
@@ -83,6 +101,7 @@ obj_test ()
 	fi
 }
 
+# Makes sure that there are Cxx source files in src
 src_code_test ()
 {
 	array=(src/*.c*)
@@ -96,6 +115,7 @@ src_code_test ()
 	fi
 }
 
+# Detects the language
 detect_language ()
 {
 	array=(src/*.c*)
@@ -115,34 +135,98 @@ detect_language ()
 	done
 }
 
+# Detects the header files in src
 detect_header_files ()
 {
-	array=(src/*.h*)
-	if [ "${array[0]}" = "src/*.h*" ];
+	if [ $SUBDIRECTORIES ];
 	then
-		print_with_color "yellow" "No headers detected in 'src'."
-	else
-		HEADERS="${array[0]}"
-		for ((i=1;i<${#array[@]};i+=1));
-		do
-			HEADERS="$HEADERS ${array[$i]}"
+		array=(src/*.h* src/*/*.h*)
+
+		if test -e ${array[0]};
+		then
+			HEADERS="${array[0]}";
+		fi
+		
+		for ((i=0;i<${#array[@]};i+=1)); do
+			if test -e ${array[$i]};
+			then
+				HEADERS="$HEADERS ${array[$i]}"
+			fi
 		done
+	else
+		array=(src/*.h*)
+		if [ "${array[0]}" = "src/*.h*" ];
+		then
+			print_with_color "yellow" "No headers detected in 'src'."
+			return
+		else
+			HEADERS="${array[0]}"
+			for ((i=1;i<${#array[@]};i+=1));
+			do
+				HEADERS="$HEADERS ${array[$i]}"
+			done
+		fi
 	fi
+	
 }
 
+# Detects the object code to generate based on the names of the source files in C
 detect_objects ()
 {
-	sourcearray=(src/*.c*)
-	for ((i=0;i<${#sourcearray[@]};i+=1));
-	do
-		filename="$(basename ${sourcearray[$i]})"
-		if [ $i -eq 0 ];
-		then
-			OBJECTS="obj/${filename%.*}.o"
-		else
-			OBJECTS="$OBJECTS obj/${filename%.*}.o"
-		fi
-	done
+	if [ $SUBDIRECTORIES ];
+	then
+		sourcearray=(src/*.c* src/*/*.c*)
+
+		last=${#soucearray[@]}-1
+		
+		for ((i=0;i<${#sourcearray[@]};i+=1));
+		do
+			if [ "${sourcearray[$i]}" = "src/*/*.c*" ];
+			then
+				BRK=0
+			fi
+
+			if [ "$BRK" != "0" ];
+			then
+				dir_name="$(dirname ${sourcearray[$i]})"
+				dir_basename="$(basename $dir_name)"
+				filename="$(basename ${sourcearray[$i]})"
+			
+				echo -n "${sourcearray[$i]}: dn \"$dir_name\" db \"$dir_basename\" fn \"$filename\"; "
+
+				if [ "$dir_basename" = "src" ];
+				then
+					echo "base-level source"
+					if [ "$i" = "0" ];
+					then
+						OBJECTS="obj/${filename%.*}.o"
+					else
+						OBJECTS="$OBJECTS obj/${filename%.*}.o"
+					fi
+				else
+					echo "subdir source"
+					if [ "$i" = "0" ];
+					then
+						OBJECTS="obj/${dir_basename}_${filename%.*}.o"
+					else
+						OBJECTS="$OBJECTS obj/${dir_basename}_${filename%.*}.o"
+					fi
+				fi
+			fi
+		done
+	else
+		sourcearray=(src/*.c*)
+		for ((i=0;i<${#sourcearray[@]};i+=1));
+		do
+			filename="$(basename ${sourcearray[$i]})"
+			if [ $i -eq 0 ];
+			then
+				OBJECTS="obj/${filename%.*}.o"
+			else
+				OBJECTS="$OBJECTS obj/${filename%.*}.o"
+			fi
+		done
+	fi
 }
 
 detect_libraries ()
@@ -205,6 +289,21 @@ print_with_color "cyan" "Running some tests on your tree!"
 
 src_test
 obj_test
+
+detect_multi_src_folders
+
+if [ "${#SUBDIRECTORY_NAME_ARRAY[@]}" = "1" ] && [ "$(basename ${SUBDIRECTORY_NAME_ARRAY[0]})" = "*" ];
+then
+	echo "No subdirectories detected!"
+	NO_SUBDIRECTORIES=0
+else
+	for ((i=0;i<${#SUBDIRECTORY_NAME_ARRAY[@]};i+=1));
+	do
+		echo "Subdirectories: ${SUBDIRECTORY_NAME_ARRAY[$i]}"
+	done
+	SUBDIRECTORIES=0
+fi
+
 
 src_code_test
 
