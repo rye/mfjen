@@ -20,22 +20,20 @@ License
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
- <pre>
-      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+          0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
-      0 0 0 0 0 0 0 a 0 0 0 0 0 0 0
+          0 0 0 0 0 0 0 a 0 0 0 0 0 0 0
 
-      0 0 0 0 0 0 a C a 0 0 0 0 0 0
+          0 0 0 0 0 0 a C a 0 0 0 0 0 0
 
-      0 0 0 0 0 a a a a a 0 0 0 0 0
+          0 0 0 0 0 a a a a a 0 0 0 0 0
 
-      0 0 0 0 a a a a a a a 0 0 0 0
+          0 0 0 0 a a a a a a a 0 0 0 0
 
-      0 0 0 a a a a a a a a a 0 0 0
+          0 0 0 a a a a a a a a a 0 0 0
 
-  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
-  0 0 0 0 0 0 0 K O P I M I 0 0 0 0 0 0
+      0 0 0 0 0 0 0 K O P I M I 0 0 0 0 0 0
 
- 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-</pre>
+     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
