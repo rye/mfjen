@@ -21,19 +21,11 @@ License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
           0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-
           0 0 0 0 0 0 0 a 0 0 0 0 0 0 0
-
           0 0 0 0 0 0 a C a 0 0 0 0 0 0
-
           0 0 0 0 0 a a a a a 0 0 0 0 0
-
           0 0 0 0 a a a a a a a 0 0 0 0
-
           0 0 0 a a a a a a a a a 0 0 0
-
       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-
       0 0 0 0 0 0 0 K O P I M I 0 0 0 0 0 0
-
      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
