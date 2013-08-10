@@ -1,4 +1,4 @@
-bject files
+Object files
 *.o
 
 # Libraries
@@ -19,6 +19,4 @@ bject files
 *.i*86
 
 # Linux stuff
-.*
-!.gitignore
 *~
