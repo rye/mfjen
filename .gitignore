@@ -22,3 +22,6 @@ doc/
 !.gitignore
 !.gitkeep
 *~
+
+# Project To-Do stuff
+.todo.json
