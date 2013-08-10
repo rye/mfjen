@@ -1,0 +1,3 @@
+require "mfjen"
+
+puts "Hello!"
