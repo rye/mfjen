@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Detects if src/*/*.{h,c} is a thing
+# Detects if include/*/*.{h,c} src/*/*.{h,c} is a thing
 # (only detects first-level subdirectories, symlink if necessarily)
 detect_multi_src_folders ()
 {
-	SUBDIRECTORY_NAME_ARRAY=(src/*/)
+	SUBDIRECTORY_NAME_ARRAY=(include/*/ src/*/)
 	for ((i=0;i<${#SUBDIRECTORY_NAME_ARRAY[@]};i+=1));
 	do
 		if [ "$(basename ${SUBDIRECTORY_NAME_ARRAY[$i]})" = "*" ];
@@ -107,7 +107,7 @@ src_code_test ()
 	array=(src/*.c*)
 	if [ "${array[0]}" = "src/*.c*" ];
 	then
-		print_with_color "red" "No source detected in 'src', create some!"
+		print_with_color "red" "No source detected in 'src/', create some!"
 		EXIT_AFTER_TESTS=1
 	else
 		printf "%-32s" "'source code' test... "
@@ -140,7 +140,18 @@ detect_header_files ()
 {
 	if [ $SUBDIRECTORIES ];
 	then
-		array=(src/*.h* src/*/*.h*)
+		array=(include/ include/*/ src/ src/*/)
+		for header_path in "${array[@]}"
+		do
+			header_path_files="$header_path*.h*"
+			header_path_files_array=( $header_path_files )
+			if test -e ${header_path_files_array};
+			then
+				HEADER_DIRS_INCLUDE="$HEADER_DIRS_INCLUDE -I $header_path "
+			fi
+		done
+	
+		array=(include/*.h* include/*/*.h* src/*.h* src/*/*.h*)
 
 		if test -e ${array[0]};
 		then
@@ -154,16 +165,29 @@ detect_header_files ()
 			fi
 		done
 	else
-		array=(src/*.h*)
-		if [ "${array[0]}" = "src/*.h*" ];
+		array=(include/)
+		for header_path in "${array[@]}"
+		do
+			header_path_files="$header_path*.h*"
+			header_path_files_array=( $header_path_files )
+			if test -e ${header_path_files_array};
+			then
+				HEADER_DIRS_INCLUDE="$HEADER_DIRS_INCLUDE -I $header_path "
+			fi
+		done
+		
+		array=(include/*.h* src/*.h*)
+		if [[ "${array[0]}" = "include/*.h*" || "${array[0]}" = "src/*.h*" ]];
 		then
-			print_with_color "yellow" "No headers detected in 'src'."
-			return
+			print_with_color "yellow" "No headers detected in 'src/' or 'include/'."
 		else
 			HEADERS="${array[0]}"
 			for ((i=1;i<${#array[@]};i+=1));
 			do
-				HEADERS="$HEADERS ${array[$i]}"
+				if test -e ${array[$i]};
+				then
+					HEADERS="$HEADERS ${array[$i]}"
+				fi
 			done
 		fi
 	fi
@@ -242,8 +266,8 @@ detect_libraries ()
 			"-f" | "--flags")
 				FLAGS="${arg[$i+1]}"
 				;;
-			"-lf" | "--linkflags")
-				LINKFLAGS="${arg[$i+1]}"
+			"-l" | "-lf" | "--linkflags")
+				LINKFLAGS="-l${arg[$i+1]}"
 				;;
 			"-cf" | "--compileflags")
 				COMPILEFLAGS="${arg[$i+1]}"
@@ -280,6 +304,8 @@ COMPILEFLAGS=\$(FLAGS) $COMPILEFLAGS
 LINKFLAGS=\$(FLAGS) $LINKFLAGS
 
 HEADERS=$HEADERS
+HEADER_DIRS_INCLUDE=$HEADER_DIRS_INCLUDE
+
 PROGRAMOBJECTS=$OBJECTS
 
 PROGRAM=src/$PROJECT_NAME.\$(shell arch)
@@ -288,8 +314,10 @@ all: \$(PROGRAM)
 
 $EXTRASTRING
 
-obj/%.o: src/%.$FILE_EXTENSION \$(HEADERS)
-	\$(COMPILER) -c -o \$@ \$< \$(COMPILEFLAGS) -fPIC
+include/%.h: 
+
+obj/%.o: src/%.$FILE_EXTENSION 
+	\$(COMPILER) -c -o \$@ \$< \$(COMPILEFLAGS) \$(HEADER_DIRS_INCLUDE) -fPIC
 
 \$(PROGRAM): \$(PROGRAMOBJECTS)
 	\$(COMPILER) -o \$(PROGRAM) \$(PROGRAMOBJECTS) \$(LINKFLAGS)
@@ -306,7 +334,7 @@ detect_multi_src_folders
 if [ "${#SUBDIRECTORY_NAME_ARRAY[@]}" = "1" ] && [ "$(basename ${SUBDIRECTORY_NAME_ARRAY[0]})" = "*" ];
 then
 	echo "No subdirectories detected!"
-	NO_SUBDIRECTORIES=0
+	SUBDIRECTORIES=0
 else
 	for ((i=0;i<${#SUBDIRECTORY_NAME_ARRAY[@]};i+=1));
 	do
