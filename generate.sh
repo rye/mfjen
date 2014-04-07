@@ -314,9 +314,9 @@ all: \$(PROGRAM)
 
 $EXTRASTRING
 
-include/%.h: 
+include/%.h:
 
-obj/%.o: src/%.$FILE_EXTENSION 
+obj/%.o: src/%.$FILE_EXTENSION
 	\$(COMPILER) -c -o \$@ \$< \$(COMPILEFLAGS) \$(HEADER_DIRS_INCLUDE) -fPIC
 
 \$(PROGRAM): \$(PROGRAMOBJECTS)
