@@ -343,7 +343,6 @@ else
 	SUBDIRECTORIES=0
 fi
 
-
 src_code_test
 
 if [ "$EXIT_AFTER_TESTS" = "1" ];
