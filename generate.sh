@@ -5,6 +5,7 @@
 detect_multi_src_folders ()
 {
 	SUBDIRECTORY_NAME_ARRAY=(include/*/ src/*/)
+
 	for ((i=0;i<${#SUBDIRECTORY_NAME_ARRAY[@]};i+=1));
 	do
 		if [ "$(basename ${SUBDIRECTORY_NAME_ARRAY[$i]})" = "*" ];
@@ -47,6 +48,7 @@ print_with_color ()
 			COLORSTR="\033[39m"
 			;;
 	esac
+
 	echo -en "$COLORSTR"
 	echo -en "$2"
 	echo -e "\033[39m"
